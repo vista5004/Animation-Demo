@@ -59,34 +59,220 @@
         return doc.createElement(name);
       },
       className:function(className,context){
-        var children, elements, i, l, classNames;
         context=context||doc;
-        return context.getElementByclassName(className)
+        return context.getElementsByClassName(className)
       },
       remove:function(node){
         var context=node.parentNode;
         context.removeChild(node);
       },
       setStyle:function(ele,styleNames){
-        for(var n in classNames){
-          ele.style[n]=styleNames[n];
+        for(var n in styleNames){
+          if(styleNames.hasOwnProperty(n)){
+            ele.style[n]=styleNames[n]
+          }
+        }
+      },
+      getStyle: function (ele,attr) {
+        if(!ele){
+          return
+        }
+        if(attr==='float'){
+          attr='cssFloat';
+        }
+        if(ele.style[attr]){
+          return ele.style[attr]
+        }
+        if(window.getComputedStyle){
+          getComputedStyle(ele,null)[attr]
+        }else if(document.defaultView && document.defaultView.getComputedStyle){
+          attr = attr.replace(/([/A-Z])/g, "-$1");
+          attr = attr.toLowerCase();
+          var style = document.defaultView.getComputedStyle(el, "");
+          return style && style.getPropertyValue(attr);
+        }else if(ele.currentStyle){
+          return ele.currentStyle[ele]
+        }
+      },
+      setAttr: function (ele,json) {
+        for(var i in json){
+          ele.setAttribute(i,json[i]);
+        }
+      }
+    };
+    var Tween = {
+      Linear: function (t, b, c, d) { return c * t / d + b; },
+      Quad: {//Quadratic二次方效果
+        easeIn: function (t, b, c, d) {
+          return c * (t /= d) * t + b;
+        },
+        easeOut: function (t, b, c, d) {
+          return -c * (t /= d) * (t - 2) + b;
+        },
+        easeInOut: function (t, b, c, d) {
+          if ((t /= d / 2) < 1) return c / 2 * t * t + b;
+          return -c / 2 * ((--t) * (t - 2) - 1) + b;
+        }
+      },
+      Cubic: {//Cubic 立方效果
+        easeIn: function (t, b, c, d) {
+          return c * (t /= d) * t * t + b;
+        },
+        easeOut: function (t, b, c, d) {
+          return c * ((t = t / d - 1) * t * t + 1) + b;
+        },
+        easeInOut: function (t, b, c, d) {
+          if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
+          return c / 2 * ((t -= 2) * t * t + 2) + b;
+        }
+      },
+      Quart: {// Quartic  四次方效果
+        easeIn: function (t, b, c, d) {
+          return c * (t /= d) * t * t * t + b;
+        },
+        easeOut: function (t, b, c, d) {
+          return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+        },
+        easeInOut: function (t, b, c, d) {
+          if ((t /= d / 2) < 1) return c / 2 * t * t * t * t + b;
+          return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
+        }
+      },
+      Quint: {// Quintic五次方效果
+        easeIn: function (t, b, c, d) {
+          return c * (t /= d) * t * t * t * t + b;
+        },
+        easeOut: function (t, b, c, d) {
+          return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+        },
+        easeInOut: function (t, b, c, d) {
+          if ((t /= d / 2) < 1) return c / 2 * t * t * t * t * t + b;
+          return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+        }
+      },
+      Sine: {//Sinusoidal 正弦效果
+        easeIn: function (t, b, c, d) {
+          return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+        },
+        easeOut: function (t, b, c, d) {
+          return c * Math.sin(t / d * (Math.PI / 2)) + b;
+        },
+        easeInOut: function (t, b, c, d) {
+          return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
+        }
+      },
+      Expo: { // Exponential指数
+        easeIn: function (t, b, c, d) {
+          return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+        },
+        easeOut: function (t, b, c, d) {
+          return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
+        },
+        easeInOut: function (t, b, c, d) {
+          if (t == 0) return b;
+          if (t == d) return b + c;
+          if ((t /= d / 2) < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+          return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
+        }
+      },
+      Circ: { //circle循环
+        easeIn: function (t, b, c, d) {
+          return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+        },
+        easeOut: function (t, b, c, d) {
+          return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+        },
+        easeInOut: function (t, b, c, d) {
+          if ((t /= d / 2) < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+          return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+        }
+      },
+      Elastic: {//  Elastic 弹性
+        easeIn: function (t, b, c, d, a, p) {
+          if (t == 0) return b; if ((t /= d) == 1) return b + c; if (!p) p = d * .3;
+          if (!a || a < Math.abs(c)) { a = c; var s = p / 4; }
+          else var s = p / (2 * Math.PI) * Math.asin(c / a);
+          return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+        },
+        easeOut: function (t, b, c, d, a, p) {
+          if (t == 0) return b; if ((t /= d) == 1) return b + c; if (!p) p = d * .3;
+          if (!a || a < Math.abs(c)) { a = c; var s = p / 4; }
+          else var s = p / (2 * Math.PI) * Math.asin(c / a);
+          return (a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
+        },
+        easeInOut: function (t, b, c, d, a, p) {
+          if (t == 0) return b; if ((t /= d / 2) == 2) return b + c; if (!p) p = d * (.3 * 1.5);
+          if (!a || a < Math.abs(c)) { a = c; var s = p / 4; }
+          else var s = p / (2 * Math.PI) * Math.asin(c / a);
+          if (t < 1) return -.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+          return a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * .5 + c + b;
+        }
+      },
+      Back: {//后退
+        easeIn: function (t, b, c, d, s) {
+          if (s == undefined) s = 1.70158;
+          return c * (t /= d) * t * ((s + 1) * t - s) + b;
+        },
+        easeOut: function (t, b, c, d, s) {
+          if (s == undefined) s = 1.70158;
+          return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
+        },
+        easeInOut: function (t, b, c, d, s) {
+          if (s == undefined) s = 1.70158;
+          if ((t /= d / 2) < 1) return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
+          return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
+        }
+      },
+      Bounce: {// Bounce反弹
+        easeIn: function (t, b, c, d) {
+          return c - Tween.Bounce.easeOut(d - t, 0, c, d) + b;
+        },
+        easeOut: function (t, b, c, d) {
+          if ((t /= d) < (1 / 2.75)) {
+            return c * (7.5625 * t * t) + b;
+          } else if (t < (2 / 2.75)) {
+            return c * (7.5625 * (t -= (1.5 / 2.75)) * t + .75) + b;
+          } else if (t < (2.5 / 2.75)) {
+            return c * (7.5625 * (t -= (2.25 / 2.75)) * t + .9375) + b;
+          } else {
+            return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
+          }
+        },
+        easeInOut: function (t, b, c, d) {
+          if (t < d / 2) return Tween.Bounce.easeIn(t * 2, 0, c, d) * .5 + b;
+          else return Tween.Bounce.easeOut(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
         }
       }
     }
     exports.selector=$d;
+    exports.animate=Tween;
   })(window)
 
-  var SVG=function () {
+  var SVG=function (setting) {
     this.data={
       centerNode:{text:'克鲁兹'},
       otherNode:[
-        {x:100,y:100,text:'易车网'},
-        {x:300,y:700,text:'23'}
       ]
     };
+    var defaults={
+      number:9,
+      angleNum:360/this.number,
+      centerR:250
+    };
+    if(setting){
+      for(var key in setting){
+        defaults[key]=setting[key]
+      }
+    }
+
     this.oParent=selector.$("#div1");
     this.centerX=this.oParent.offsetWidth/2;
     this.centerY=this.oParent.offsetHeight/2;
+    for(var i=0;i<defaults.number;i++){
+      var x=Math.sin(i*40*Math.PI/180)*defaults.centerR+this.centerY;
+      var y=Math.cos(i*40*Math.PI/180)*defaults.centerR+this.centerX;
+      this.data.otherNode.push({x:x,y:y,text:i});
+    }
   };
   SVG.prototype={
     svgNS:'http://www.w3.org/2000/svg',
@@ -102,11 +288,11 @@
         'height':"100%"
       });
       this.svg=oSVG;
-
       for(var i=0;i<this.data.otherNode.length;i++){
         that.addOtherTag(that.data.otherNode[i],that.svg);
       }
       this.addMainTag();
+      this.bindEvent();
     },
     createTag: function (tag,objAttr) {
       var tag=document.createElementNS(this.svgNS,tag);
@@ -118,6 +304,7 @@
     addMainTag: function () {
       var oG=this.createTag('g',{
         'style':'cursor:pointer',
+        'class':'mainCircle'
       });
       var oCircle=this.createTag('circle',{
         'cx':this.centerX,
@@ -172,9 +359,15 @@
         'text-anchor':'middle'
       });
       oText1.innerHTML="?";
-      var oG=this.createTag('g',{
-        'style':'cursor:pointer'
+      var oG1=this.createTag('g',{
+        'style':'cursor:pointer',
+        'class':'otherLine'
       });
+      var oG2=this.createTag('g',{
+        'style':'cursor:pointer',
+        'class':'otherCircle'
+      });
+
       var oCircle=this.createTag('circle',{
         'cx':otherAttr.x,
         'cy':otherAttr.y,
@@ -185,28 +378,96 @@
       });
       var oText2=this.createTag('text',{
         'x':otherAttr.x,
-        'y':otherAttr.y,
+        'y':otherAttr.y+8,
         'fill':'black',
         'font-size':20,
         'text-anchor':'middle'
       });
-      oText2.innerHTML=otherAttr.text;
-      oG.appendChild(line1);
-      oG.appendChild(line2);
-      oG.appendChild(oRect);
-      oG.appendChild(oText1);
-      oG.appendChild(oCircle);
-      oG.appendChild(oText2);
-      oSvg.appendChild(oG);
-    },
+      oText2.innerHTML="OK";
+      oG1.appendChild(line1);
+      oG1.appendChild(line2);
+      oG1.appendChild(oRect);
+      oG1.appendChild(oText1);
 
+
+      oG2.appendChild(oCircle);
+      oG2.appendChild(oText2);
+      oSvg.appendChild(oG1);
+      oSvg.appendChild(oG2);
+    },
+//    tween animation
+    tweenAnimate: function (obj,start,end,dur) {
+      clearInterval(obj.timer);
+      var changeValue=end-start;
+      var newR;
+      var t=0;
+      obj.timer=setInterval(function () {
+        t+=5;
+        newR=animate.Elastic.easeOut(t,start,changeValue,dur)
+        if(t<dur){
+          selector.setAttr(obj,{
+            "r":newR
+          })
+        }
+      },30)
+    },
+    bindEvent: function () {
+      var otherLine=selector.className("otherLine");
+      var mainCircle=selector.className("mainCircle");
+      //var otherCircle=selector.className("otherCircle");
+      var otherCircle=document.getElementsByClassName("otherCircle");
+      var that=this;
+      for(var i=0;i<otherLine.length;i++){
+        otherLine[i].onmouseover= function () {
+          var previous=this;
+          selector.setAttr(previous.getElementsByTagName('line')[0],{
+            'stroke':'blue'
+          });
+          selector.setAttr(previous.getElementsByTagName("rect")[0],{
+            'fill':'red'
+          })
+        };
+        otherLine[i].onmouseleave= function () {
+          var previous=this;
+          selector.setAttr(previous.getElementsByTagName('line')[0],{
+            'stroke':'#ccc'
+          });
+          selector.setAttr(previous.getElementsByTagName("rect")[0],{
+            'fill':'#ccc'
+          })
+        };
+      }
+      for(var k=0;k<otherCircle.length;k++){
+        otherCircle[k].onmouseenter= function () {
+          var previous=this.previousElementSibling;
+          selector.setAttr(previous.getElementsByTagName('line')[0],{
+            'stroke':'#547'
+          });
+          selector.setAttr(previous.getElementsByTagName("rect")[0],{
+            'fill':'#782'
+          });
+          that.tweenAnimate(this.getElementsByTagName('circle')[0],30,50,300);
+          console.log(1);
+        };
+        otherCircle[k].onmouseleave= function () {
+          var previous=this.previousElementSibling;
+          selector.setAttr(previous.getElementsByTagName('line')[0],{
+            'stroke':'#ccc'
+          });
+          selector.setAttr(previous.getElementsByTagName("rect")[0],{
+            'fill':'#ccc'
+          });
+          that.tweenAnimate((this.getElementsByTagName('circle')[0]),50,30,300)
+        }
+      }
+    }
   }
   window.onload=function(){
     var svg=new SVG;
     svg.init()
 
   }
-  
+
 </script>
 
 </html>
