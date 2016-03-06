@@ -13,11 +13,31 @@
       height: 800px;
       border: 1px solid green;
     }
+    #div2{
+      position: absolute;
+      left: 800px;
+      width: 800px;
+      height: 800px;
+      border: 1px solid green;
+    }
+    #div3{
+      position: absolute;
+      top: 800px;
+      width: 800px;
+      height: 800px;
+      border: 1px solid green;
+    }
   </style>
 
 </head>
 <body style="text-align: center;">
   <div id="div1">
+
+  </div>
+  <div id="div2">
+
+  </div>
+  <div id="div3">
 
   </div>
 </body>
@@ -243,10 +263,10 @@
           else return Tween.Bounce.easeOut(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
         }
       }
-    }
+    };
     exports.selector=$d;
     exports.animate=Tween;
-  })(window)
+  })(window);
 
   var SVG=function (setting) {
     this.data={
@@ -266,6 +286,7 @@
     }
 
     this.oParent=selector.$("#div1");
+    this.oParent1=selector.$("#div2");
     this.centerX=this.oParent.offsetWidth/2;
     this.centerY=this.oParent.offsetHeight/2;
     for(var i=0;i<defaults.number;i++){
@@ -293,7 +314,20 @@
       }
       this.addMainTag();
       this.bindEvent();
+      var oSVG1=this.createTag("svg",{
+        'xmls':this.svgNS,
+        'width':"100%",
+        'height':"100%"
+      });
+      this.svg1=oSVG1;
+      this.points='';
+      this.createPolyLine(this.svg1,{
+        'fill':'none',
+        'stroke':'navy',
+        'stroke-width':'2'
+      });
     },
+    //创建元素
     createTag: function (tag,objAttr) {
       var tag=document.createElementNS(this.svgNS,tag);
       for(var attr in objAttr){
@@ -460,6 +494,79 @@
           that.tweenAnimate((this.getElementsByTagName('circle')[0]),50,30,300)
         }
       }
+    },
+    //动态创建折线
+    createPolyLine: function (obj,attr) {
+      var that=this;
+      var targetPolyLine;
+      var targetCircle;
+      var oCircleMove;
+      obj.onclick= function (e) {
+        var ev=e||window.event;
+        var x= ev.clientX-that.oParent1.offsetLeft;
+        var y= ev.clientY-that.oParent1.offsetTop;
+        if(that.points===''){
+          that.points=x+','+y;
+        }else{
+          that.points+=','+x+','+y;
+        }
+//        只添加一次，如果存在就不再添加
+        if(!oPolyLine){
+          var oPolyLine=that.createTag('polyline',attr);
+          var oCircle=that.createTag('circle',{
+            'cx':x,
+            'cy':y,
+            'r':5,
+            'fill':'transparent',
+            'stroke':'pink',
+            'stroke-width':'2'
+          });
+          targetPolyLine=oPolyLine;
+          targetCircle=oCircle;
+          this.appendChild(targetPolyLine);
+          this.appendChild(targetCircle);
+        }
+        selector.setAttr(targetPolyLine,{
+          'points':that.points
+        });
+      };
+      //    进入后添加小圆圈
+      obj.onmouseenter= function () {
+        var oCircle=that.createTag('circle',{
+          'r':'5',
+          'fill':'transparent',
+          'stroke':'pink',
+          'stroke-width':'2'
+        });
+        oCircleMove=oCircle;
+        this.appendChild(oCircleMove);
+      };
+      obj.onmouseleave= function () {
+        this.removeChild(oCircleMove);
+      };
+//      实时显示折线
+      obj.onmousemove= function (e) {
+        var ev=e||window.event;
+        var x=ev.clientX-that.oParent1.offsetLeft;
+        var y=ev.clientY-that.oParent1.offsetTop;
+        if(oCircleMove){
+          selector.setAttr(oCircleMove,{
+            'cx':x,
+            'cy':y
+          })
+        }
+        if(targetPolyLine){
+          selector.setAttr(targetPolyLine,{
+            'points':that.points+','+x+','+y
+          });
+        }
+      };
+//      右键取消事件
+      obj.oncontextmenu= function () {
+        obj.onmousemove=null;//移动事件取消
+        return false;
+      };
+      that.oParent1.appendChild(obj);
     }
   }
   window.onload=function(){
