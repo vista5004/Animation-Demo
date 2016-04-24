@@ -9,5 +9,5 @@
 </ul>
 ###DOM动画库
 <ul>
-<li>动画序列，具体详情查看[blog](http://www.jianshu.com/p/3208e51d8c01）
+<li>动画序列，具体详情查看[blog](http://www.jianshu.com/p/3208e51d8c01)
 </ul>
