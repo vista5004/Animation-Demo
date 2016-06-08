@@ -57,3 +57,91 @@ function clone(obj) {
     }
     return res;
 }
+//ellipse设置（椭圆）
+ellipse = function (cx, cy, rx, ry) {
+        var el = make("ellipse", this.node);
+        if (is(cx, "object") && "cx" in cx) {
+            el.attr(cx);
+        } else if (cx != null) {
+            el.attr({
+                cx: cx,
+                cy: cy,
+                rx: rx,
+                ry: ry
+            });
+        }
+        return el;
+    };
+//Group设置（组）
+group = proto.g = function (first) {
+        var el = make("g", this.node);
+        el.add = add2group;
+        for (var method in proto) if (proto[has](method)) {
+            el[method] = proto[method];
+        }
+        if (arguments.length == 1 && first && !first.type) {
+            el.attr(first);
+        } else if (arguments.length) {
+            el.add(Array.prototype.slice.call(arguments, 0));
+        }
+        return el;
+};
+//text设置
+text = function (x, y, text) {
+        var el = make("text", this.node);
+        if (is(x, "object")) {
+            el.attr(x);
+        } else if (x != null) {
+            el.attr({
+                x: x,
+                y: y,
+                text: text || ""
+            });
+        }
+        return el;
+};
+//line设置（直线）
+line = function (x1, y1, x2, y2) {
+        var el = make("line", this.node);
+        if (is(x1, "object")) {
+            el.attr(x1);
+        } else if (x1 != null) {
+            el.attr({
+                x1: x1,
+                x2: x2,
+                y1: y1,
+                y2: y2
+            });
+        }
+        return el;
+};
+//polyline设置（折线）
+polyline = function (points) {
+        if (arguments.length > 1) {
+            points = Array.prototype.slice.call(arguments, 0);
+        }
+        var el = make("polyline", this.node);
+        if (is(points, "object") && !is(points, "array")) {
+            el.attr(points);
+        } else if (points != null) {
+            el.attr({
+                points: points
+            });
+        }
+        return el;
+};
+//polygon设置多边形
+polygon = function (points) {
+        if (arguments.length > 1) {
+            points = Array.prototype.slice.call(arguments, 0);
+        }
+        var el = make("polygon", this.node);
+        if (is(points, "object") && !is(points, "array")) {
+            el.attr(points);
+        } else if (points != null) {
+            el.attr({
+                points: points
+            });
+        }
+        return el;
+}
