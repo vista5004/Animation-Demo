@@ -11,3 +11,12 @@
 <ul>
 <li>动画序列，具体详情查看(http://www.jianshu.com/p/3208e51d8c01)
 </ul>
+###SVG mini库
+<ul>
+<li>function ellipse(cx, cy, rx, ry)绘制椭圆
+<li>function group(...svg)绘制g标签组
+<li>function gradient(...) 绘制渐变元素<br>
+在 SVG 中，有两种主要的渐变类型：线性渐变和放射性渐变
+<li>
+<li>
+</ul>
