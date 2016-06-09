@@ -145,3 +145,168 @@ polygon = function (points) {
         }
         return el;
 }
+//circle设置圆形
+circle = function (cx, cy, r) {
+        var el = make("circle", this.node);
+        if (is(cx, "object") && "cx" in cx) {
+            el.attr(cx);
+        } else if (cx != null) {
+            el.attr({
+                cx: cx,
+                cy: cy,
+                r: r
+            });
+        }
+        return el;
+};
+//gradient 渐变描述
+function gradient(defs, str) {
+    var grad = arrayFirstValue(eve("snap.util.grad.parse", null, str)),
+        el;
+    if (!grad) {
+        return null;
+    }
+    grad.params.unshift(defs);
+    if (grad.type.toLowerCase() == "l") {
+        el = gradientLinear.apply(0, grad.params);
+    } else {
+        el = gradientRadial.apply(0, grad.params);
+    }
+    if (grad.type != grad.type.toLowerCase()) {
+        $(el.node, {
+            gradientUnits: "userSpaceOnUse"
+        });
+    }
+    var stops = grad.stops,
+        len = stops.length,
+        start = 0,
+        j = 0;
+    function seed(i, end) {
+        var step = (end - start) / (i - j);
+        for (var k = j; k < i; k++) {
+            stops[k].offset = +(+start + step * (k - j)).toFixed(2);
+        }
+        j = i;
+        start = end;
+    }
+    len--;
+    for (var i = 0; i < len; i++) if ("offset" in stops[i]) {
+        seed(i, stops[i].offset);
+    }
+    stops[len].offset = stops[len].offset || 100;
+    seed(len, stops[len].offset);
+    for (i = 0; i <= len; i++) {
+        var stop = stops[i];
+        el.addStop(stop.color, stop.offset);
+    }
+    return el;
+}
+function gradientLinear(defs, x1, y1, x2, y2) {
+    var el = make("linearGradient", defs);
+    el.stops = Gstops;
+    el.addStop = GaddStop;
+    el.getBBox = GgetBBox;
+    if (x1 != null) {
+        $(el.node, {
+            x1: x1,
+            y1: y1,
+            x2: x2,
+            y2: y2
+        });
+    }
+    return el;
+}
+function gradientRadial(defs, cx, cy, r, fx, fy) {
+    var el = make("radialGradient", defs);
+    el.stops = Gstops;
+    el.addStop = GaddStop;
+    el.getBBox = GgetBBox;
+    if (cx != null) {
+        $(el.node, {
+            cx: cx,
+            cy: cy,
+            r: r
+        });
+    }
+    if (fx != null && fy != null) {
+        $(el.node, {
+            fx: fx,
+            fy: fy
+        });
+    }
+    return el;
+}
+//
+function image (src, x, y, width, height) {
+        var el = make("image", this.node);
+        if (is(src, "object") && "src" in src) {
+            el.attr(src);
+        } else if (src != null) {
+            var set = {
+                "xlink:href": src,
+                preserveAspectRatio: "none"
+            };
+            if (x != null && y != null) {
+                set.x = x;
+                set.y = y;
+            }
+            if (width != null && height != null) {
+                set.width = width;
+                set.height = height;
+            } else {
+                preload(src, function () {
+                    $(el.node, {
+                        width: this.offsetWidth,
+                        height: this.offsetHeight
+                    });
+                });
+            }
+            $(el.node, set);
+        }
+        return el;
+    };
+    
+//照片加载失败后重新加载
+function preload  (function () {
+    function onerror() {
+        this.parentNode.removeChild(this);
+    }
+    return function (src, f) {
+        var img = glob.doc.createElement("img"),
+            body = glob.doc.body;
+        img.style.cssText = "position:absolute;left:-9999em;top:-9999em";
+        img.onload = function () {
+            f.call(img);
+            img.onload = img.onerror = null;
+            body.removeChild(img);
+        };
+        img.onerror = onerror;
+        body.appendChild(img);
+        img.src = src;
+    };
+}());
+//画矩形
+function rect (x, y, w, h, rx, ry) {
+        var el = make("rect", this.node);
+        if (ry == null) {
+            ry = rx;
+        }
+        if (is(x, "object") && "x" in x) {
+            el.attr(x);
+        } else if (x != null) {
+            el.attr({
+                x: x,
+                y: y,
+                width: w,
+                height: h
+            });
+            if (rx != null) {
+                el.attr({
+                    rx: rx,
+                    ry: ry
+                });
+            }
+        }
+        return el;
+  };
+  
