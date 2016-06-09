@@ -17,6 +17,9 @@
 <li>function group(...svg)绘制g标签组
 <li>function gradient(...) 绘制渐变元素<br>
 在 SVG 中，有两种主要的渐变类型：线性渐变和放射性渐变
-<li>
+<li> function image(src, x, y, width, height) 绘制图片
+<li>function line(x1, y1, x2, y2)绘制直线
+<li>function path([pathString]) 绘制路径
+<li>function polyline(…) 绘制折线
 <li>
 </ul>
