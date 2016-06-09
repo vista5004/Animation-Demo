@@ -236,7 +236,72 @@ function gradientRadial(defs, cx, cy, r, fx, fy) {
     }
     return el;
 }
-//
+function arrayFirstValue(arr) {
+    var res;
+    for (var i = 0, ii = arr.length; i < ii; i++) {
+        res = res || arr[i];
+        if (res) {
+            return res;
+        }
+    }
+}
+function make(name, parent) {
+    var res = $(name);
+    parent.appendChild(res);
+    var el = wrap(res);
+    el.type = name;
+    return el;
+}
+function Paper(w, h) {
+    var res,
+        desc,
+        defs,
+        proto = Paper.prototype;
+    if (w && w.tagName == "svg") {
+        if (w.snap in hub) {
+            return hub[w.snap];
+        }
+        res = new Element(w);
+        desc = w.getElementsByTagName("desc")[0];
+        defs = w.getElementsByTagName("defs")[0];
+        if (!desc) {
+            desc = $("desc");
+            desc.appendChild(glob.doc.createTextNode("Created with Snap"));
+            res.node.appendChild(desc);
+        }
+        if (!defs) {
+            defs = $("defs");
+            res.node.appendChild(defs);
+        }
+        res.defs = defs;
+        for (var key in proto) if (proto[has](key)) {
+            res[key] = proto[key];
+        }
+        res.paper = res.root = res;
+    } else {
+        res = make("svg", glob.doc.body);
+        $(res.node, {
+            height: h,
+            version: 1.1,
+            width: w,
+            xmlns: "http://www.w3.org/2000/svg"
+        });
+    }
+    return res;
+}
+function wrap(dom) {
+    if (!dom) {
+        return dom;
+    }
+    if (dom instanceof Element || dom instanceof Fragment) {
+        return dom;
+    }
+    if (dom.tagName == "svg") {
+        return new Paper(dom);
+    }
+    return new Element(dom);
+}
+//image svg图片
 function image (src, x, y, width, height) {
         var el = make("image", this.node);
         if (is(src, "object") && "src" in src) {
