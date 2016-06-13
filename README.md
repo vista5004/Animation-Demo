@@ -10,6 +10,7 @@
 ###DOM动画库
 <ul>
 <li>动画序列，具体详情查看(http://www.jianshu.com/p/3208e51d8c01)
+<li>timeMoveFun(obj,t,JSON,type,fn) 基于时间的动画函数，可以配置Tween缓冲动画。
 </ul>
 ###SVG mini库
 <ul>
