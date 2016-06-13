@@ -501,5 +501,43 @@ function rect (x, y, w, h, rx, ry) {
             return Tween['bounceIn'](t*2, 0, c, d) * 0.5 + b;
          }
          return Tween['bounceOut'](t*2-d, 0, c, d) * 0.5 + c*0.5 + b;
-      }
-      
+    }
+    var getStyle(obj,attr){
+        if(obj.currentStyle){
+            return obj.currentStyle[attr]
+        }else if(window.getComputedStyle){
+            return getComputedStyle(obj,attr)[false]
+        }
+    } 
+    var timeMoveFun(obj,t,JSON,type,fn){
+        var startValue={};
+        var startTime=(new Data()).getTime();
+        var (var key in JSON){
+            startValue[key]=0;
+            if(key==="opacity"){
+                startValue[key]=Math.round(getStyle(obj,key)*100);
+            }else{
+                startValue[key]=parseInt(getStyle(obj,key));
+            }
+        }
+        clearInterval(obj.timer);
+        obj.timer=setInterval(function(){
+            var currentTime=(new Data()).getTime();
+            var scale=1-Math.max(startTime+t-currentTime)/t;
+            for(var key in JSON){
+                var value=Tween[type](scale*t,startValue[key],JSON[key]-startValue[key],t);   
+                if(key==="opacity"){
+                    obj.style.filter='alpah(opacity("+value+"))';
+                    obj.style.opacity=value/100;
+                }else{
+                    obj.style[key]=value+"px";
+                }
+            }
+            if(scale===1){
+                clearInterval(obj.timer);
+                if(fn){
+                    fn.call(obj,null);
+                }
+            }
+        },30)
+    }  
