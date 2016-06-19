@@ -423,6 +423,82 @@
 		'fill':'rgb(159,218,191)',
 		'stroke-width':'1',
 		'tittle':'class1'
-	}],svgObject)
+	}],svgObject);
+	svg.createText([{
+		x:'30',
+		y:'310',
+		fill:'blue',
+		'font-size':'14',
+		'text-anchor':'middle',
+		'tittle':'333',
+		'id':'class1'
+	},{
+		x:'50',
+		y:'240',
+		fill:'blue',
+		'font-size':'14',
+		'text-anchor':'middle',
+		'tittle':'123',
+		'id':'class2'
+	},{
+		x:'90',
+		y:'280',
+		fill:'blue',
+		'font-size':'14',
+		'text-anchor':'middle',
+		'tittle':'3245',
+		'id':'class3'
+	},{
+		x:'180',
+		y:'180',
+		fill:'blue',
+		'font-size':'14',
+		'text-anchor':'middle',
+		'tittle':'555',
+		'id':'class4'
+	},{
+		x:'260',
+		y:'240',
+		fill:'blue',
+		'font-size':'14',
+		'text-anchor':'middle',
+		'tittle':'444',
+		'id':'class5'
+	},{
+		x:'355',
+		y:'360',
+		fill:'blue',
+		'font-size':'14',
+		'text-anchor':'middle',
+		'tittle':'777',
+		'id':'class6'
+	}],svgObject);
+	/*text display:none*/
+	var textNone=function(){
+		var text=$d.tagName("text");
+		for(var i=0;i<text.length;i++){
+			$d.addStyle(text[i],'display','none');
+		}
+	};
+	textNone();
+	var circleAnimation=function(){
+		var circle=$d.tagName("circle");
+		for(var i=0;i<circle.length;i++){
+			console.log(circle[i]);
+			$d.eventHandle(circle[i],'mouseenter', function () {
+				$d.tweenAnimateR(this,'Elastic','easeOut',5,10,150);
+				var textIdName=$d.getAttribute(this,['tittle'])[0];
+				var text=$d.id(textIdName);
+				$d.addStyle(text, 'display','block')
+			})
+			$d.eventHandle(circle[i],'mouseleave', function () {
+				$d.tweenAnimateR(this,'Elastic','easeOut',10,5,150);
+				var textIdName=$d.getAttribute(this,['tittle'])[0];
+				var text=$d.id(textIdName);
+				$d.addStyle(text, 'display','none')
+			})
+		}
+	};
+	circleAnimation();
 </script>
 </html>
