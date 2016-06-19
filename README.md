@@ -25,6 +25,6 @@
 <li>
 </ul>
 SVG地图图谱果：<br>
-![SVG折线图.gif](https://github.com/vista5004/Animation-Demo/blob/master/img/SVGmap.gif)
+![SVG折线图.gif](https://github.com/vista5004/Animation-Demo/blob/master/img/SVGmap.gif)<br>
 SVG地图折线图果：<br>
-![SVG折线图.gif](https://github.com/vista5004/Animation-Demo/blob/master/img/SVG%E6%8A%98%E7%BA%BF%E5%9B%BE.gif)
+![SVG折线图.gif](https://github.com/vista5004/Animation-Demo/blob/master/img/SVG%E6%8A%98%E7%BA%BF%E5%9B%BE.gif)<br>
